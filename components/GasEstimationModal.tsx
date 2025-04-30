@@ -6,12 +6,12 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/common/Dialog";
-import { Button } from "@/components/common/Button";
 import { useState, useEffect } from "react";
 import { formatUnits } from "viem";
 import { ExternalLink } from "lucide-react";
 import { getEstimatedFee } from "@gelatomega/core/oracle";
 import { defaultChain, TOKEN_CONFIG } from "@/constants/blockchain";
+
 interface GasEstimationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,7 +40,7 @@ export function GasEstimationModal({
       setEstimatedGas("");
     }
   }, [isOpen]);
-  
+
   /**
    * Formats a token balance from raw value to human-readable format
    * @param value - The raw token amount as a string
@@ -154,21 +154,20 @@ export function GasEstimationModal({
           </div>
         </div>
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
+          <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-white border-zinc-800 hover:border-zinc-700"
+            className="px-4 py-2 text-sm font-medium text-text-tertiary hover:text-text-title border border-base-700 hover:border-base-600 rounded-lg transition-colors"
           >
             Cancel
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={estimateGasFee}
             disabled={isEstimating}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-base-700 hover:bg-base-600 text-text-title rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isEstimating ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-text-title border-t-transparent rounded-full animate-spin"></div>
                 <span>Estimating...</span>
               </>
             ) : (
@@ -176,11 +175,11 @@ export function GasEstimationModal({
                 <span>Estimate Gas</span>
               </>
             )}
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => onConfirm(estimatedGas)}
             disabled={!estimatedGas || isEstimating}
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-purple-500/20"
+            className="w-full py-3 bg-blue-600 hover:opacity-80 text-text-title rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-base-700/20"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -196,7 +195,7 @@ export function GasEstimationModal({
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span>Confirm</span>
-          </Button>
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -25,9 +25,7 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID=your-dynamic-environment-id
-NEXT_PUBLIC_ZERODEV_PROJECT_ID=your-zerodev-project-id
 NEXT_PUBLIC_GELATO_API_KEY="your-gelato-api-key"
-NEXT_PUBLIC_RPC_URL="your-rpc-url"
 ```
 
 ---
@@ -35,12 +33,14 @@ NEXT_PUBLIC_RPC_URL="your-rpc-url"
 ## Getting Started
 
 1. **Clone the repository:**
+
    ```sh
    git clone https://github.com/your-org/eip7702-next-demo.git
    cd eip7702-next-demo
    ```
 
 2. **Install dependencies:**
+
    ```sh
    pnpm install
    ```
@@ -63,6 +63,7 @@ pnpm build
 ```
 
 To start the production server:
+
 ```sh
 pnpm start
 ```

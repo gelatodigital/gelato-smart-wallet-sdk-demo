@@ -32,7 +32,6 @@
     "@zerodev/sdk": "^5.4.28",
     "@zerodev/webauthn-key": "^5.4.0",
     "axios": "^1.7.9",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "encoding": "^0.1.13",
