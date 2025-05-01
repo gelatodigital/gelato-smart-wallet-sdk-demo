@@ -19,9 +19,8 @@ export default function Header() {
         </div>
         <p className="text-sm text-text-tertiary max-w-xl">
           Enable powerful smart wallets (EIP-7702) and embedded wallet <br />
-          experiences across any EVM chain. Seamlessly build smart accounts,{" "}
-          gasless <br /> flows and seamless onboarding—all from one unified
-          dashboard.
+          experiences across any EVM chain. Easily create smart accounts,{" "}
+          enable gasless transactions <br /> and streamline onboarding -- all from a unified dashboard.
         </p>
       </div>
       <div className="flex items-center mt-4 md:mt-0">
