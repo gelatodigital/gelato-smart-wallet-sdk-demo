@@ -6,7 +6,12 @@ import Header from "../components/Header";
 import WalletCard from "@/components/WalletCard";
 import FeatureCards from "../components/FeatureCards";
 import ActivityLog from "../components/ActivityLog";
-import { encodeFunctionData } from "viem";
+import {
+  createPublicClient,
+  encodeFunctionData,
+  formatUnits,
+  http,
+} from "viem";
 import { Toaster, toast } from "sonner";
 import { GasEstimationModal } from "@/components/GasEstimationModal";
 import { useTokenHoldings } from "@/lib/hooks/useFetchBalances";
@@ -14,12 +19,22 @@ import { Address, Log } from "viem";
 import { TransactionModal } from "@/components/TransactionModal";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
-import { createMegaClient, erc20, sponsored } from "@gelatomega/core";
 import {
-  useGelatoMegaProviderContext,
-  GelatoMegaConnectButton,
-} from "@gelatomega/react-sdk";
-import { TOKEN_CONFIG, TOKEN_DETAILS } from "@/constants/blockchain";
+  createGelatoSmartWalletClient,
+  erc20,
+  GelatoTaskStatus,
+  native,
+  sponsored,
+} from "@gelatonetwork/smartwallet";
+import {
+  useGelatoSmartWalletProviderContext,
+  GelatoSmartWalletConnectButton,
+} from "@gelatonetwork/smartwallet-react-sdk";
+import {
+  defaultChain,
+  TOKEN_CONFIG,
+  TOKEN_DETAILS,
+} from "@/constants/blockchain";
 
 interface HomeProps {}
 
@@ -27,10 +42,10 @@ const GELATO_API_KEY = process.env.NEXT_PUBLIC_GELATO_API_KEY!;
 
 export default function Home({}: HomeProps) {
   const [accountAddress, setAccountAddress] = useState("");
-  const [megaClient, setMegaClient] = useState<any>(null);
+  const [smartWalletClient, setSmartWalletClient] = useState<any>(null);
   const [logs, setLogs] = useState<
     {
-      message: string | JSX.Element;
+      message: string;
       timestamp: string;
       details?: {
         userOpHash?: string;
@@ -73,16 +88,20 @@ export default function Home({}: HomeProps) {
   });
 
   // 7702 configuration
-  const { walletClient, logout } = useGelatoMegaProviderContext();
+  const {
+    gelato: { client },
+    logout,
+  } = useGelatoSmartWalletProviderContext();
+
   const { data: tokenHoldings, refetch: refetchTokenHoldings } =
     useTokenHoldings(accountAddress as Address, gasToken);
 
-  const createClient = async () => {
-    const megaClient = createMegaClient(walletClient as any);
-    setUser(walletClient?.account.address);
-    setAccountAddress(walletClient?.account.address as string);
-    setMegaClient(walletClient);
-    return megaClient;
+  const fetchClient = () => {
+    const smartWalletClient = client;
+    setUser(client?.account.address);
+    setAccountAddress(client?.account.address as string);
+    setSmartWalletClient(smartWalletClient);
+    return smartWalletClient;
   };
 
   const handleLogout = async () => {
@@ -98,7 +117,7 @@ export default function Home({}: HomeProps) {
 
   const addLog = useCallback(
     (
-      message: string | JSX.Element,
+      message: string,
       details?: {
         userOpHash?: string;
         txHash?: string;
@@ -122,12 +141,54 @@ export default function Home({}: HomeProps) {
     []
   );
 
+  const getActualFees = async (
+    txHash: string,
+    gasTokenAddress: string,
+    gasToken: "USDC" | "WETH"
+  ) => {
+    try {
+      const publicClient = createPublicClient({
+        chain: defaultChain,
+        transport: http(),
+      });
+
+      const receipt = await publicClient.getTransactionReceipt({
+        hash: txHash as `0x${string}`,
+      });
+
+      // Find Transfer event from the gas token to the paymaster
+      const transferEvents = receipt.logs.filter((log: Log) => {
+        // Check if this is a Transfer event from the gas token contract
+        return (
+          log.address.toLowerCase() === gasTokenAddress.toLowerCase() &&
+          log.topics[0] ===
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+        ); // Transfer event signature
+      });
+
+      if (transferEvents.length > 0) {
+        // Get the last transfer event which should be the fee payment
+        const lastTransferEvent = transferEvents[transferEvents.length - 1];
+        const amount = BigInt(lastTransferEvent.data);
+        const formattedAmount = formatUnits(
+          amount,
+          TOKEN_CONFIG[gasToken].decimals
+        );
+        return `${formattedAmount} ${TOKEN_CONFIG[gasToken].symbol}`;
+      }
+      return "Fee information not available";
+    } catch (error) {
+      console.error("Error getting actual fees:", error);
+      return "Error fetching fee information";
+    }
+  };
+
   const handleGasEstimationConfirm = async (estimatedGas: string) => {
     setShowGasEstimation(false);
     setLoadingTokens(true);
     setIsTransactionProcessing(true);
     try {
-      const megaClient = await createClient();
+      const smartWalletClient = fetchClient();
 
       let data = encodeFunctionData({
         abi: TOKEN_DETAILS.abi,
@@ -137,14 +198,13 @@ export default function Home({}: HomeProps) {
 
       const calls = [
         {
-          to: TOKEN_DETAILS.address as `0x${string}`,
+          to: TOKEN_DETAILS.address as Address,
           value: BigInt(0),
           data,
         },
       ];
-
-      const userOpHash = await megaClient.execute({
-        payment: erc20(TOKEN_CONFIG[gasToken].address as `0x${string}`),
+      const smartWalletResponse = await smartWalletClient?.execute({
+        payment: erc20(TOKEN_CONFIG[gasToken].address as Address),
         calls,
       });
 
@@ -152,7 +212,7 @@ export default function Home({}: HomeProps) {
       addLog(
         `Sending userOp through Gelato Bundler - paying gas with ${gasToken}`,
         {
-          userOpHash,
+          userOpHash: smartWalletResponse?.id,
           gasDetails: {
             estimatedGas,
             gasToken,
@@ -160,17 +220,21 @@ export default function Home({}: HomeProps) {
           isSponsored: false,
         }
       );
-      await new Promise((resolve) => setTimeout(resolve, 4000));
+      const txHash = await smartWalletResponse?.wait();
 
-      const response = await getTaskStatus(userOpHash);
-      const txHash = response.task.transactionHash;
+      const actualGas = await getActualFees(
+        txHash as string,
+        TOKEN_CONFIG[gasToken].address as Address,
+        gasToken
+      );
 
       // Add completion log with all details
       addLog("Minted drop tokens on chain successfully", {
-        userOpHash,
+        userOpHash: smartWalletResponse?.id,
         txHash,
         gasDetails: {
           estimatedGas,
+          actualGas,
           gasToken,
         },
         isSponsored: false,
@@ -207,7 +271,7 @@ export default function Home({}: HomeProps) {
     setLoadingTokens(true);
     setIsTransactionProcessing(true);
     try {
-      const megaClient = await createClient();
+      const smartWalletClient = fetchClient();
       let data = encodeFunctionData({
         abi: TOKEN_DETAILS.abi,
         functionName: "drop",
@@ -216,13 +280,12 @@ export default function Home({}: HomeProps) {
 
       const calls = [
         {
-          to: TOKEN_DETAILS.address as `0x${string}`,
+          to: TOKEN_DETAILS.address as Address,
           value: BigInt(0),
           data,
         },
       ];
-
-      const userOpHash = await megaClient.execute({
+      const smartWalletResponse = await smartWalletClient?.execute({
         payment: sponsored(GELATO_API_KEY),
         calls,
       });
@@ -232,19 +295,16 @@ export default function Home({}: HomeProps) {
           ? "Sending userOp through Gelato Bundler - Sponsored"
           : `Sending UserOp through Gelato Bundler - paying gas with ${gasToken}`,
         {
-          userOpHash,
+          userOpHash: smartWalletResponse?.id,
           isSponsored: gasPaymentMethod === "sponsored",
         }
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-
-      const response = await getTaskStatus(userOpHash);
-      const txHash = response.task.transactionHash;
+      const txHash = await smartWalletResponse?.wait();
 
       // Add success log
       addLog("Minted drop tokens on chain successfully", {
-        userOpHash,
+        userOpHash: smartWalletResponse?.id,
         txHash,
         isSponsored: gasPaymentMethod === "sponsored",
       });
@@ -271,12 +331,6 @@ export default function Home({}: HomeProps) {
     }
   };
 
-  const getTaskStatus = async (userOpHash: string) => {
-    const url = `https://relay.dev.gelato.digital/tasks/status/${userOpHash}`;
-    const response = await fetch(url);
-    return response.json();
-  };
-
   const handleShowTransactionDetails = useCallback((details: any) => {
     setTransactionDetails({
       isOpen: true,
@@ -288,13 +342,13 @@ export default function Home({}: HomeProps) {
   }, []);
 
   useEffect(() => {
-    async function createAccount() {
-      if (walletClient) {
+    function createAccount() {
+      if (client) {
         try {
           setIsInitializing(true);
-          await createClient();
+          fetchClient();
         } catch (error) {
-          console.error("Failed to create mega client:", error);
+          console.error("Failed to create smart wallet client:", error);
           toast.error("Failed to initialize wallet");
           setIsInitializing(false);
         } finally {
@@ -303,7 +357,7 @@ export default function Home({}: HomeProps) {
       }
     }
     createAccount();
-  }, [walletClient]);
+  }, [client]);
 
   useEffect(() => {
     if (tokenHoldings) {
@@ -342,7 +396,7 @@ export default function Home({}: HomeProps) {
           </div>
         )}
 
-        <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Header />
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-1 space-y-4">
@@ -356,15 +410,17 @@ export default function Home({}: HomeProps) {
                 </div>
               ) : !user ? (
                 <div className="w-full flex flex-col items-center justify-center p-4 bg-[#161616] border rounded-[12px] border-[#2A2A2A] h-[244px] gap-y-6">
-                  <span className="block text-md text-white font-medium">Playground</span>
+                  <span className="block text-md text-white font-medium">
+                    Gelato Smart Wallet SDK Playground
+                  </span>
                   <div className="flex flex-col items-center justify-center">
-                    <GelatoMegaConnectButton>
+                    <GelatoSmartWalletConnectButton>
                       <div className="flex items-center justify-center w-[130px] h-[44px] py-2.5 px-4 bg-[#2970FF] rounded-md hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed relative text-sm text-white font-medium">
                         <span className="text-sm text-white font-medium">
                           Login
                         </span>
                       </div>
-                    </GelatoMegaConnectButton>
+                    </GelatoSmartWalletConnectButton>
                   </div>
                 </div>
               ) : (
@@ -588,20 +644,12 @@ export default function Home({}: HomeProps) {
             </div>
             <div className="flex items-center gap-6">
               <a
-                href="https://docs.gelato.network"
+                href="https://www.npmjs.com/package/@gelatonetwork/smartwallet-react-sdk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
               >
                 Documentation
-              </a>
-              <a
-                href="https://github.com/gelatodigital/eip7702-next-demo/tree/gelato-7702"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
-              >
-                GitHub
               </a>
             </div>
           </div>
@@ -614,7 +662,7 @@ export default function Home({}: HomeProps) {
             setGasPaymentMethod("sponsored");
           }}
           onConfirm={handleGasEstimationConfirm}
-          megaClient={megaClient}
+          smartWalletClient={smartWalletClient}
           gasToken={gasToken}
           tokenBalance={tokenBalance}
         />
@@ -622,7 +670,7 @@ export default function Home({}: HomeProps) {
         <TransactionModal
           isOpen={transactionDetails.isOpen}
           onClose={() =>
-            setTransactionDetails((prev) => ({ ...prev, isOpen: false }))
+            setTransactionDetails((prev: any) => ({ ...prev, isOpen: false }))
           }
           userOpHash={transactionDetails.userOpHash}
           txHash={transactionDetails.txHash}

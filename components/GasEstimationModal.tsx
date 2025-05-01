@@ -7,16 +7,19 @@ import {
   DialogFooter,
 } from "@/components/common/Dialog";
 import { useState, useEffect } from "react";
-import { formatUnits } from "viem";
+import { Address, encodeFunctionData, formatUnits } from "viem";
 import { ExternalLink } from "lucide-react";
-import { getEstimatedFee } from "@gelatomega/core/oracle";
-import { defaultChain, TOKEN_CONFIG } from "@/constants/blockchain";
-
+import {
+  defaultChain,
+  TOKEN_CONFIG,
+  TOKEN_DETAILS,
+} from "@/constants/blockchain";
+import { erc20 } from "@gelatonetwork/smartwallet";
 interface GasEstimationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (estimatedGas: string) => void;
-  megaClient: any;
+  smartWalletClient: any;
   gasToken: "USDC" | "WETH";
   tokenBalance: string;
 }
@@ -25,7 +28,7 @@ export function GasEstimationModal({
   isOpen,
   onClose,
   onConfirm,
-  megaClient,
+  smartWalletClient,
   gasToken,
 }: GasEstimationModalProps) {
   const [estimatedGas, setEstimatedGas] = useState<string>("");
@@ -70,18 +73,33 @@ export function GasEstimationModal({
     try {
       setIsEstimating(true);
       const gasTokenAddress = TOKEN_CONFIG[gasToken].address;
-      const estimatedFee = await getEstimatedFee(
-        megaClient.chain.id,
-        gasTokenAddress,
-        // TODO: dynamic gas limit
-        BigInt(200000),
-        BigInt(0)
-      );
+
+      let data = encodeFunctionData({
+        abi: TOKEN_DETAILS.abi,
+        functionName: "drop",
+        args: [],
+      });
+
+      const calls = [
+        {
+          to: TOKEN_DETAILS.address as Address,
+          value: BigInt(0),
+          data,
+        },
+      ];
+
+      const results = await smartWalletClient.estimate({
+        payment: erc20(gasTokenAddress as Address),
+        calls,
+      });
+
       setEstimatedGas(
-        `${formatBalance(estimatedFee.toString(), 18)} ${
-          TOKEN_CONFIG[gasToken].symbol
-        }`
+        `${formatBalance(
+          results.estimatedFee,
+          TOKEN_CONFIG[gasToken].decimals
+        )} ${TOKEN_CONFIG[gasToken].symbol}`
       );
+      
     } catch (error) {
       console.error("Error estimating gas:", error);
       setEstimatedGas("Error estimating gas");
