@@ -4,7 +4,7 @@ import { formatRelativeTime } from "@/lib/utils";
 
 interface ActivityLogProps {
   logs: {
-    message: string | JSX.Element;
+    message: string;
     timestamp: string;
     details?: {
       userOpHash?: string;

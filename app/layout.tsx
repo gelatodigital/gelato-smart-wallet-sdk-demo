@@ -11,9 +11,7 @@ export const metadata: Metadata = {
     title: "Gelato",
     description:
       "Explore EIP-7702 gas sponsorship and account abstraction in this interactive playground",
-    images: [
-      "",
-    ],
+    images: ["https://smart-wallet-sdk.demo.gelato.cloud/gelato-sdk-og.png"],
   },
   icons: {
     icon: "https://raas.staging.gelato.network/images/favicon.ico",

@@ -40,7 +40,7 @@ export function TransactionModal({
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">User Operation Status</span>
               <a
-                href={`https://relay.dev.gelato.digital/tasks/status/${userOpHash}`}
+                href={`https://relay.gelato.digital/tasks/status/${userOpHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-300 inline-flex items-center gap-2 text-sm"
@@ -70,10 +70,13 @@ export function TransactionModal({
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Gas Details</span>
               <div className="text-sm space-y-1">
-                <p>
-                  Estimated Gas: {gasDetails.estimatedGas} {gasDetails.gasToken}
-                </p>
+                <p>Estimated Gas: {gasDetails.estimatedGas}</p>
               </div>
+              {gasDetails.actualGas && (
+                <div className="text-sm space-y-1">
+                  <p>Actual Gas: {gasDetails.actualGas}</p>
+                </div>
+              )}
             </div>
           )}
 
