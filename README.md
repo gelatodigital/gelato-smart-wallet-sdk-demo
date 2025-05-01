@@ -25,8 +25,13 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID=your-dynamic-environment-id
-NEXT_PUBLIC_GELATO_API_KEY="your-gelato-api-key"
+NEXT_PUBLIC_GELATO_API_KEY="your-gelato-sponsor-api-key"
+NEXT_PUBLIC_RPC_URL="your-rpc-url"
 ```
+
+### How to get Gelato Sponsor API key?
+
+--- Navigate to [Gelato App](https://app.gelato.network) into relay section -> Create Relay App -> Add your networks -> Get API Key ([Learn More](https://docs.gelato.network/web3-services/relay/quick-start/sponsored-calls))
 
 ---
 
@@ -35,8 +40,8 @@ NEXT_PUBLIC_GELATO_API_KEY="your-gelato-api-key"
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/your-org/eip7702-next-demo.git
-   cd eip7702-next-demo
+   git clone https://github.com/gelatodigital/gelato-smart-wallet-sdk-demo.git
+   cd gelato-smart-wallet-sdk-demo
    ```
 
 2. **Install dependencies:**
