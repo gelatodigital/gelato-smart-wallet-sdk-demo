@@ -18,7 +18,7 @@ export default function Header() {
           <Image src="/gelato.svg" alt="Gelato" width={62} height={16} />
         </div>
         <p className="text-sm text-text-tertiary max-w-xl">
-          Enable powerful smart wallets (EIP-7702) and embedded wallet <br />
+          Enable powerful smart wallets (EIP-7702) and embedded wallet{" "}
           experiences across any EVM chain. Easily create smart accounts,{" "}
           enable gasless transactions and streamline onboarding -- all from a unified dashboard.
         </p>
