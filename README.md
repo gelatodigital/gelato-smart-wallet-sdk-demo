@@ -9,7 +9,7 @@
 ![Gelato](https://img.shields.io/badge/Gelato-FF4A4A?style=for-the-badge&logo=gelato&logoColor=white)
 ![Pnpm](https://img.shields.io/badge/pnpm-yellow?style=for-the-badge&logo=pnpm&logoColor=white)
 
-A Next.js playground for exploring EIP-7702 gas sponsorship and account abstraction, powered by Gelato.
+A Next.js playground for exploring EIP-7702 gas sponsorship and account abstraction, powered by Gelato
 
 ---
 
