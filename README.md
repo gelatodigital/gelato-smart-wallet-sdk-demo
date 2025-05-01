@@ -54,7 +54,7 @@ NEXT_PUBLIC_RPC_URL="your-rpc-url"
 
 4. **Start the development server:**
    ```sh
-   yarn dev
+   yarn run dev
    ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
