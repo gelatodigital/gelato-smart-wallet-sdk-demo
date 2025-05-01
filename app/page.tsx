@@ -399,11 +399,7 @@ export default function Home({}: HomeProps) {
         <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Header />
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <div className="lg:col-span-1 space-y-4">
-              <FeatureCards />
-            </div>
-
-            <div className="lg:col-span-2 space-y-4">
+            <div className="order-1 lg:order-2 lg:col-span-2 space-y-4">
               {isInitializing ? (
                 <div className="p-8 bg-[#161616] border border-[#2A2A2A] rounded-[12px] text-center">
                   <LoadingSpinner />
@@ -621,15 +617,18 @@ export default function Home({}: HomeProps) {
                 </>
               )}
             </div>
+            <div className="order-2 lg:order-1 lg:col-span-1 space-y-4">
+              <FeatureCards />
+            </div>
           </div>
         </div>
 
         {/* Footer */}
         <footer className="border-t border-[#2A2A2A] mt-auto">
-          <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center text-sm text-zinc-400">
-            <div className="flex items-center gap-2">
+          <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 text-sm text-zinc-400">
+            <div className="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
               <span>Built by Gelato</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>
                 Powered by{" "}
                 <a
@@ -642,14 +641,30 @@ export default function Home({}: HomeProps) {
                 </a>
               </span>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+              <a
+                href="https://github.com/gelatodigital/smartwallet"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
+              >
+                Documentation
+              </a>
+              <a
+                href="https://github.com/gelatodigital/gelato-smart-wallet-sdk-demo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
+              >
+                Source Code
+              </a>
               <a
                 href="https://www.npmjs.com/package/@gelatonetwork/smartwallet-react-sdk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-zinc-400 hover:text-zinc-300 transition-colors"
               >
-                Documentation
+                NPM Package
               </a>
             </div>
           </div>
