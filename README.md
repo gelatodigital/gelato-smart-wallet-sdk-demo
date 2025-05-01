@@ -7,9 +7,9 @@
 ![TailwindCSS](https://img.shields.io/badge/-TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Wagmi](https://img.shields.io/badge/Wagmi-FFD700?style=for-the-badge&logo=ethereum&logoColor=black)
 ![Gelato](https://img.shields.io/badge/Gelato-FF4A4A?style=for-the-badge&logo=gelato&logoColor=white)
-![Pnpm](https://img.shields.io/badge/pnpm-yellow?style=for-the-badge&logo=pnpm&logoColor=white)
+![Yarn](https://img.shields.io/badge/yarn-yellow?style=for-the-badge&logo=yarn&logoColor=white)
 
-A Next.js playground for exploring EIP-7702 gas sponsorship and account abstraction, powered by Gelato
+A Next.js playground for exploring EIP-7702 gas sponsorship and account abstraction, powered by Gelato.
 
 ---
 
@@ -17,7 +17,7 @@ A Next.js playground for exploring EIP-7702 gas sponsorship and account abstract
 
 - Git
 - Node.js (v18 or higher)
-- pnpm
+- yarn
 
 ## Environment Variables
 
@@ -47,14 +47,14 @@ NEXT_PUBLIC_RPC_URL="your-rpc-url"
 2. **Install dependencies:**
 
    ```sh
-   pnpm install
+   yarn install
    ```
 
 3. **Set up your environment variables** as described above.
 
 4. **Start the development server:**
    ```sh
-   pnpm dev
+   yarn dev
    ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
@@ -64,13 +64,13 @@ The application will be available at [http://localhost:3000](http://localhost:30
 ## Building for Production
 
 ```sh
-pnpm build
+yarn build
 ```
 
 To start the production server:
 
 ```sh
-pnpm start
+yarn start
 ```
 
 ---
