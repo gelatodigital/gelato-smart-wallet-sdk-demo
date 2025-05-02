@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@gelatonetwork/smartwallet": "0.0.2-alpha.3",
     "@gelatonetwork/smartwallet-react-sdk": "0.0.2-alpha.4",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.0",
