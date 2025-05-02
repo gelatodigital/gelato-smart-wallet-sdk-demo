@@ -167,7 +167,7 @@ export default function Home({}: HomeProps) {
         const formattedAmount = parseFloat(
           formatUnits(amount, TOKEN_CONFIG[gasToken].decimals)
         ).toLocaleString(undefined, {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: gasToken == "WETH" ? 10 : 6,
           minimumFractionDigits: 0,
         });
         return `${formattedAmount} ${TOKEN_CONFIG[gasToken].symbol}`;

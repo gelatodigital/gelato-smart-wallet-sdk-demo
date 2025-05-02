@@ -1,19 +1,19 @@
-import { sepolia } from "viem/chains";
+import { baseSepolia, sepolia } from "viem/chains";
 import { FaEthereum } from "react-icons/fa";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 
 // Default chain for the app. Can be changed to any other chain supported by viem
-export const defaultChain = sepolia;
+export const defaultChain = baseSepolia;
 
 export const TOKEN_CONFIG = {
   USDC: {
-    address: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+    address: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
     symbol: "USDC",
     decimals: 6,
     icon: HiOutlineCurrencyDollar,
   },
   WETH: {
-    address: "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
+    address: "0x4200000000000000000000000000000000000006",
     symbol: "WETH",
     decimals: 18,
     icon: FaEthereum,
@@ -21,7 +21,7 @@ export const TOKEN_CONFIG = {
 };
 
 export const TOKEN_DETAILS = {
-  address: "0xE83d80DD2462a053390863505D56D40D6F028E92",
+  address: "0x7503384FA2731D34A5170ab5b12d674f74D54EDf",
   abi: [
     { inputs: [], stateMutability: "nonpayable", type: "constructor" },
     {
