@@ -19,14 +19,15 @@ export default function Header() {
         </div>
         <p className="text-sm text-text-tertiary max-w-xl">
           Enable powerful smart wallets (EIP-7702) and embedded wallet{" "}
-          experiences across any EVM chain. Easily create smart accounts,{" "}
-          enable gasless transactions and streamline onboarding -- all from a unified dashboard.
+          experiences <br /> across any EVM chain. Easily create smart accounts,
+          enable gasless transactions <br /> and streamline onboarding -- all
+          from a unified dashboard.
         </p>
       </div>
       <div className="flex items-center mt-4 md:mt-0">
-        <div 
+        <div
           onClick={handleCopy}
-          className="px-4 py-2 bg-[#202020] border border-[#2A2A2A] rounded-md text-sm font-mono text-gray-300 cursor-pointer hover:bg-[#2A2A2A] transition-colors relative"
+          className="px-4 py-2 bg-[#202020] border border-[#2A2A2A] rounded-md text-xs font-mono text-gray-300 cursor-pointer hover:bg-[#2A2A2A] transition-colors relative"
         >
           npm i @gelatonetwork/smartwallet-react-sdk
           {copied && (
