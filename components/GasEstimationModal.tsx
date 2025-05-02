@@ -33,6 +33,7 @@ export function GasEstimationModal({
 }: GasEstimationModalProps) {
   const [estimatedGas, setEstimatedGas] = useState<string>("");
   const [isEstimating, setIsEstimating] = useState(false);
+  const [hasInsufficientBalance, setHasInsufficientBalance] = useState(false);
 
   /**
    * Reset the estimated gas value whenever the modal is opened
@@ -41,6 +42,7 @@ export function GasEstimationModal({
   useEffect(() => {
     if (isOpen) {
       setEstimatedGas("");
+      setHasInsufficientBalance(false);
     }
   }, [isOpen]);
 
@@ -55,7 +57,7 @@ export function GasEstimationModal({
       return parseFloat(formatUnits(BigInt(value), decimals)).toLocaleString(
         undefined,
         {
-          maximumFractionDigits: 4,
+          maximumFractionDigits: 6,
           minimumFractionDigits: 0,
         }
       );
@@ -99,10 +101,18 @@ export function GasEstimationModal({
           TOKEN_CONFIG[gasToken].decimals
         )} ${TOKEN_CONFIG[gasToken].symbol}`
       );
-      
     } catch (error) {
-      console.error("Error estimating gas:", error);
-      setEstimatedGas("Error estimating gas");
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const isInsufficientBalance = errorMessage.includes(
+        "Insufficient balance"
+      );
+      setHasInsufficientBalance(isInsufficientBalance);
+      setEstimatedGas(
+        isInsufficientBalance
+          ? "Insufficient balance for gas fees"
+          : "Error estimating gas"
+      );
     } finally {
       setIsEstimating(false);
     }
@@ -196,7 +206,7 @@ export function GasEstimationModal({
           </button>
           <button
             onClick={() => onConfirm(estimatedGas)}
-            disabled={!estimatedGas || isEstimating}
+            disabled={!estimatedGas || isEstimating || hasInsufficientBalance}
             className="w-full py-3 bg-blue-600 hover:opacity-80 text-text-title rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-base-700/20"
           >
             <svg
