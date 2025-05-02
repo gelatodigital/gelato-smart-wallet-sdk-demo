@@ -33,13 +33,10 @@ export default function WalletCard({
 
   /**
    * Opens the account address in a new tab
-   * Uses the Scope Explorer for Sepolia
+   * Uses the Scope Explorer for Base Sepolia
    */
   const handleExplorerClick = () => {
-    window.open(
-      `https://scope.sh/11155111/address/${accountAddress}`,
-      "_blank"
-    );
+    window.open(`https://scope.sh/84532/address/${accountAddress}`, "_blank");
   };
 
   return (
@@ -70,7 +67,9 @@ export default function WalletCard({
         <div className="mb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-dark-100 p-2 rounded border border-dark-200 gap-2 sm:gap-0">
             <code className="text-sm text-text-title" title={accountAddress}>
-              <span className="hidden sm:inline break-all">{accountAddress}</span>
+              <span className="hidden sm:inline break-all">
+                {accountAddress}
+              </span>
               <span className="sm:hidden">
                 {accountAddress.slice(0, 6)}...{accountAddress.slice(-4)}
               </span>

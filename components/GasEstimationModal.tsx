@@ -33,7 +33,7 @@ export function GasEstimationModal({
 }: GasEstimationModalProps) {
   const [estimatedGas, setEstimatedGas] = useState<string>("");
   const [isEstimating, setIsEstimating] = useState(false);
-  const [hasInsufficientBalance, setHasInsufficientBalance] = useState(false);
+  const [confirmButtonDisabled, setConfirmButtonDisabled] = useState(false);
 
   /**
    * Reset the estimated gas value whenever the modal is opened
@@ -42,7 +42,7 @@ export function GasEstimationModal({
   useEffect(() => {
     if (isOpen) {
       setEstimatedGas("");
-      setHasInsufficientBalance(false);
+      setConfirmButtonDisabled(false);
     }
   }, [isOpen]);
 
@@ -57,7 +57,7 @@ export function GasEstimationModal({
       return parseFloat(formatUnits(BigInt(value), decimals)).toLocaleString(
         undefined,
         {
-          maximumFractionDigits: 6,
+          maximumFractionDigits: gasToken == "WETH" ? 10 : 6,
           minimumFractionDigits: 0,
         }
       );
@@ -104,10 +104,11 @@ export function GasEstimationModal({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-      const isInsufficientBalance = errorMessage.includes(
-        "Insufficient balance"
-      );
-      setHasInsufficientBalance(isInsufficientBalance);
+      const isInsufficientBalance =
+        errorMessage.includes("Insufficient balance") ||
+        errorMessage.includes("transfer amount exceeds balance") ||
+        errorMessage.includes("Cannot read properties");
+      setConfirmButtonDisabled(isInsufficientBalance);
       setEstimatedGas(
         isInsufficientBalance
           ? "Insufficient balance for gas fees"
@@ -168,7 +169,7 @@ export function GasEstimationModal({
                   </a>
                 ) : (
                   <a
-                    href={`${defaultChain.blockExplorers.default.url}/address/${TOKEN_CONFIG[gasToken].address}`}
+                    href={`https://base-sepolia.blockscout.com/address/${TOKEN_CONFIG[gasToken].address}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
@@ -206,7 +207,7 @@ export function GasEstimationModal({
           </button>
           <button
             onClick={() => onConfirm(estimatedGas)}
-            disabled={!estimatedGas || isEstimating || hasInsufficientBalance}
+            disabled={!estimatedGas || isEstimating || confirmButtonDisabled}
             className="w-full py-3 bg-blue-600 hover:opacity-80 text-text-title rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-base-700/20"
           >
             <svg
