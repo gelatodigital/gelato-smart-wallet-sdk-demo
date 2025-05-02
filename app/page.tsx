@@ -19,13 +19,7 @@ import { Address, Log } from "viem";
 import { TransactionModal } from "@/components/TransactionModal";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Image from "next/image";
-import {
-  createGelatoSmartWalletClient,
-  erc20,
-  GelatoTaskStatus,
-  native,
-  sponsored,
-} from "@gelatonetwork/smartwallet";
+import { erc20, sponsored } from "@gelatonetwork/smartwallet";
 import {
   useGelatoSmartWalletProviderContext,
   GelatoSmartWalletConnectButton,
@@ -170,10 +164,12 @@ export default function Home({}: HomeProps) {
         // Get the last transfer event which should be the fee payment
         const lastTransferEvent = transferEvents[transferEvents.length - 1];
         const amount = BigInt(lastTransferEvent.data);
-        const formattedAmount = formatUnits(
-          amount,
-          TOKEN_CONFIG[gasToken].decimals
-        );
+        const formattedAmount = parseFloat(
+          formatUnits(amount, TOKEN_CONFIG[gasToken].decimals)
+        ).toLocaleString(undefined, {
+          maximumFractionDigits: 6,
+          minimumFractionDigits: 0,
+        });
         return `${formattedAmount} ${TOKEN_CONFIG[gasToken].symbol}`;
       }
       return "Fee information not available";
@@ -396,7 +392,7 @@ export default function Home({}: HomeProps) {
           </div>
         )}
 
-        <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-[980px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Header />
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="order-1 lg:order-2 lg:col-span-2 space-y-4">
