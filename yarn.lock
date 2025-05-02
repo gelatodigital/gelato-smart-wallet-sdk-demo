@@ -1403,30 +1403,30 @@
   dependencies:
     tslib "^2.8.0"
 
-"@gelatonetwork/smartwallet-react-dynamic@0.0.2-alpha.3":
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-dynamic/-/smartwallet-react-dynamic-0.0.2-alpha.3.tgz#b5a5a7c3dfc1aa5edad5de197e987d8039bb115c"
-  integrity sha512-+fZGRAeOoIx0BzifJOsuyH9a9dZcpjmGxFvwnI9xf7impeTs8EVMYdlnLU4ZzjPJZwlIJpwttjiOGUwlmjqfhw==
+"@gelatonetwork/smartwallet-react-dynamic@0.0.2-alpha.4":
+  version "0.0.2-alpha.4"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-dynamic/-/smartwallet-react-dynamic-0.0.2-alpha.4.tgz#65b683785c8632cf6ca1ce53fb5806de93b90296"
+  integrity sha512-MDeD04HRkbqirToe96Nt7861TRGRKqoLU/szEzPCIbquzSdbPjGsQCXc+k7PCKnQieRYK0LhnhRcY/ZNqt3J5w==
   dependencies:
     "@dynamic-labs/ethereum" "^4.12.4"
     "@dynamic-labs/sdk-react-core" "^4.12.4"
     "@dynamic-labs/wagmi-connector" "^4.12.4"
     "@dynamic-labs/wallet-connector-core" "^4.12.4"
-    "@gelatonetwork/smartwallet" "0.0.2-alpha.3"
-    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.3"
+    "@gelatonetwork/smartwallet" "0.0.2-alpha.4"
+    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.4"
     "@tanstack/react-query" "^5.74"
     react "^18.2"
     react-dom "^18.2"
     viem "^2.28"
     wagmi "^2.15"
 
-"@gelatonetwork/smartwallet-react-privy@0.0.2-alpha.3":
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-privy/-/smartwallet-react-privy-0.0.2-alpha.3.tgz#21b9d8880c476fac1abb0a28aa84c432008f0e51"
-  integrity sha512-A33iMHuPjquFmuHssCLI/PwRPL4wdSqNbWzTs02wZkMYGuuSnc9Doijwny/u78bo5m3AxQePQyQkebQjoRqfsQ==
+"@gelatonetwork/smartwallet-react-privy@0.0.2-alpha.4":
+  version "0.0.2-alpha.4"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-privy/-/smartwallet-react-privy-0.0.2-alpha.4.tgz#62d4187e94c8a146c66e80981a8e3ef4a75e52ca"
+  integrity sha512-nwqVCZmADk1K9nbF3jLE+VEyRqERCN3uaPj4zynPVVpFlfMI7ccaTEKLKttwAAZAVO7qRo+3bV24pXCHd3ZLKw==
   dependencies:
-    "@gelatonetwork/smartwallet" "0.0.2-alpha.3"
-    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.3"
+    "@gelatonetwork/smartwallet" "0.0.2-alpha.4"
+    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.4"
     "@privy-io/react-auth" "^2.10.0"
     "@privy-io/wagmi" "^1.0.3"
     "@tanstack/react-query" "^5.74"
@@ -1437,32 +1437,32 @@
     wagmi "^2.15"
     zod "^3.24.3"
 
-"@gelatonetwork/smartwallet-react-sdk@0.0.2-alpha.3":
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-sdk/-/smartwallet-react-sdk-0.0.2-alpha.3.tgz#4d114b86b6b5def7a9b25bea4783c4c11bb0c0f6"
-  integrity sha512-8pAABLrgX5W5dZj0+/cFXtRoYpDdjGiqQDOpgPDYAOSBADCEBve97ssgj6zghUaytv9ZORYnnLDfk3N2ECRbrQ==
+"@gelatonetwork/smartwallet-react-sdk@0.0.2-alpha.4":
+  version "0.0.2-alpha.4"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-sdk/-/smartwallet-react-sdk-0.0.2-alpha.4.tgz#7bf5780952a55c4edcbe3bd9efcc8dc7e4e358d9"
+  integrity sha512-F3Vg4TMB1d7/ZctfBBJ8fOmGTgepPJ3tNRk05Utm2vNx6QEnAqneFRJSUUzIs0XOrcoKx4IJsMRnrthlHpHVsg==
   dependencies:
-    "@gelatonetwork/smartwallet-react-dynamic" "0.0.2-alpha.3"
-    "@gelatonetwork/smartwallet-react-privy" "0.0.2-alpha.3"
-    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.3"
+    "@gelatonetwork/smartwallet-react-dynamic" "0.0.2-alpha.4"
+    "@gelatonetwork/smartwallet-react-privy" "0.0.2-alpha.4"
+    "@gelatonetwork/smartwallet-react-types" "0.0.2-alpha.4"
     react "^18.2"
     viem "^2.28"
     wagmi "^2.15"
 
-"@gelatonetwork/smartwallet-react-types@0.0.2-alpha.3":
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-types/-/smartwallet-react-types-0.0.2-alpha.3.tgz#059776df0a1f862429243daf101b2b73bd1e3cff"
-  integrity sha512-2zqFEyeEl03yZo7XPhfz7xnOC6F6vdVBFaXHtrnvPeWWOCK37qazlmDuLIIf1f6vGxsI5XvozgwibHgVSASzVQ==
+"@gelatonetwork/smartwallet-react-types@0.0.2-alpha.4":
+  version "0.0.2-alpha.4"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet-react-types/-/smartwallet-react-types-0.0.2-alpha.4.tgz#6a0da5e14e4f92b5337cd5528a8319a5e653e2ce"
+  integrity sha512-uptHjI70QM87rEaeot85aX//092DnurAA0rIfoVmUrJo48RyFREnImgDQcIEEB+xcvjYZDwTi6InvY1dHg8o0w==
   dependencies:
-    "@gelatonetwork/smartwallet" "0.0.2-alpha.3"
+    "@gelatonetwork/smartwallet" "0.0.2-alpha.4"
     "@wagmi/core" "^2.17"
     react "^18.2"
     viem "^2.28"
 
-"@gelatonetwork/smartwallet@0.0.2-alpha.3":
-  version "0.0.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet/-/smartwallet-0.0.2-alpha.3.tgz#c96be056070b96e91e7dac3c54e3eeb4fa74acf6"
-  integrity sha512-7CaI9nI76Z0uTbSWt8MYr104Vs7ZkGvVaKKRBgOlsjaQkd7obnUzGQzGjCLJdtuXOiJHJWgfkT85HrXtC9jStg==
+"@gelatonetwork/smartwallet@0.0.2-alpha.4":
+  version "0.0.2-alpha.4"
+  resolved "https://registry.yarnpkg.com/@gelatonetwork/smartwallet/-/smartwallet-0.0.2-alpha.4.tgz#5314e2ad56a521d54f5301758eebf3de19a945c4"
+  integrity sha512-UKQ28o+zxN+a/0ICwjrlk8X2dgC20FKXiKC/7VFBQ9HJSVPaWrJ4nSYIP1+P/oN0UIBNmC7U/0cPNixt0TjEqw==
   dependencies:
     isomorphic-ws "^5.0.0"
     viem "^2.28"
