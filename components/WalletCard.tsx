@@ -68,18 +68,18 @@ export default function WalletCard({
         </div>
 
         <div className="mb-3">
-          <div className="flex items-center justify-between bg-dark-100 p-2 rounded border border-dark-200">
-            <code className="text-sm text-text-title">{accountAddress}</code>
-            <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-dark-100 p-2 rounded border border-dark-200 gap-2 sm:gap-0">
+            <code className="text-sm text-text-title break-all">{accountAddress}</code>
+            <div className="flex gap-2 w-full sm:w-auto justify-end">
               <button
                 onClick={handleCopy}
-                className="text-sm text-blue-500 hover:text-blue-400"
+                className="text-sm text-blue-500 hover:text-blue-400 whitespace-nowrap"
               >
                 {isCopied ? "Copied!" : "Copy"}
               </button>
               <button
                 onClick={handleExplorerClick}
-                className="text-sm text-blue-500 hover:text-blue-400 flex items-center gap-1"
+                className="text-sm text-blue-500 hover:text-blue-400 flex items-center gap-1 whitespace-nowrap"
               >
                 Explorer
                 <ExternalLink className="w-4 h-4" />
