@@ -69,7 +69,12 @@ export default function WalletCard({
 
         <div className="mb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-dark-100 p-2 rounded border border-dark-200 gap-2 sm:gap-0">
-            <code className="text-sm text-text-title break-all">{accountAddress}</code>
+            <code className="text-sm text-text-title" title={accountAddress}>
+              <span className="hidden sm:inline break-all">{accountAddress}</span>
+              <span className="sm:hidden">
+                {accountAddress.slice(0, 6)}...{accountAddress.slice(-4)}
+              </span>
+            </code>
             <div className="flex gap-2 w-full sm:w-auto justify-end">
               <button
                 onClick={handleCopy}
