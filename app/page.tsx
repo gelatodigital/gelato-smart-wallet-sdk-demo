@@ -54,7 +54,7 @@ export default function Home({}: HomeProps) {
     }[]
   >([]);
   const [gasPaymentMethod, setGasPaymentMethod] = useState<
-    "sponsored" | "erc20"
+    "sponsored" | "erc20" | ""
   >("sponsored");
   const [gasToken, setGasToken] = useState<"USDC" | "WETH">("USDC");
 
@@ -180,6 +180,7 @@ export default function Home({}: HomeProps) {
   };
 
   const handleGasEstimationConfirm = async (estimatedGas: string) => {
+    setGasPaymentMethod("erc20");
     setShowGasEstimation(false);
     setLoadingTokens(true);
     setIsTransactionProcessing(true);
@@ -253,17 +254,14 @@ export default function Home({}: HomeProps) {
       toast.error(`Error claiming token. Check the logs`);
       console.log(error);
     } finally {
+      setGasPaymentMethod("");
       setLoadingTokens(false);
       setIsTransactionProcessing(false);
     }
   };
 
   const dropToken = async () => {
-    if (gasPaymentMethod === "erc20") {
-      setShowGasEstimation(true);
-      return;
-    }
-
+    setGasPaymentMethod("sponsored");
     setLoadingTokens(true);
     setIsTransactionProcessing(true);
     try {
@@ -274,27 +272,21 @@ export default function Home({}: HomeProps) {
         args: [],
       });
 
-      const calls = [
-        {
-          to: TOKEN_DETAILS.address as Address,
-          value: BigInt(0),
-          data,
-        },
-      ];
       const smartWalletResponse = await smartWalletClient?.execute({
         payment: sponsored(GELATO_API_KEY),
-        calls,
+        calls: [
+          {
+            to: TOKEN_DETAILS.address as Address,
+            value: BigInt(0),
+            data,
+          },
+        ],
       });
 
-      addLog(
-        gasPaymentMethod === "sponsored"
-          ? "Sending userOp through Gelato Bundler - Sponsored"
-          : `Sending UserOp through Gelato Bundler - paying gas with ${gasToken}`,
-        {
-          userOpHash: smartWalletResponse?.id,
-          isSponsored: gasPaymentMethod === "sponsored",
-        }
-      );
+      addLog("Sending userOp through Gelato Bundler - Sponsored", {
+        userOpHash: smartWalletResponse?.id,
+        isSponsored: true,
+      });
 
       const txHash = await smartWalletResponse?.wait();
 
@@ -302,7 +294,7 @@ export default function Home({}: HomeProps) {
       addLog("Minted drop tokens on chain successfully", {
         userOpHash: smartWalletResponse?.id,
         txHash,
-        isSponsored: gasPaymentMethod === "sponsored",
+        isSponsored: true,
       });
 
       toast.success("Tokens claimed successfully!");
@@ -322,6 +314,7 @@ export default function Home({}: HomeProps) {
       );
       toast.error(`Error claiming token. Check the logs`);
     } finally {
+      setGasPaymentMethod("");
       setLoadingTokens(false);
       setIsTransactionProcessing(false);
     }
@@ -452,7 +445,6 @@ export default function Home({}: HomeProps) {
                         <div className="w-full mt-auto">
                           <button
                             onClick={() => {
-                              setGasPaymentMethod("sponsored");
                               dropToken();
                             }}
                             disabled={loadingTokens || isTransactionProcessing}
@@ -525,7 +517,6 @@ export default function Home({}: HomeProps) {
                               <button
                                 onClick={() => {
                                   setGasToken("USDC");
-                                  setGasPaymentMethod("erc20");
                                   setShowGasEstimation(true);
                                   setShowTokenSelection(false);
                                 }}
@@ -558,7 +549,6 @@ export default function Home({}: HomeProps) {
                               <button
                                 onClick={() => {
                                   setGasToken("WETH");
-                                  setGasPaymentMethod("erc20");
                                   setShowGasEstimation(true);
                                   setShowTokenSelection(false);
                                 }}
