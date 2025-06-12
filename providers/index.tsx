@@ -14,6 +14,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <GelatoSmartWalletContextProvider
       settings={{
+        scw: {
+          type:"gelato"
+        },
         apiKey: process.env.NEXT_PUBLIC_GELATO_API_KEY as string,
         waas: dynamic(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID as string),
         wagmi: wagmi({
