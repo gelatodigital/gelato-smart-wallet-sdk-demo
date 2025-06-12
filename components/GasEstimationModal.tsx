@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { Address, encodeFunctionData, formatUnits } from "viem";
 import { ExternalLink } from "lucide-react";
 import {
-  defaultChain,
+  NETWORKS,
   TOKEN_CONFIG,
   TOKEN_DETAILS,
 } from "@/constants/blockchain";
@@ -22,6 +22,7 @@ interface GasEstimationModalProps {
   smartWalletClient: any;
   gasToken: "USDC" | "WETH";
   tokenBalance: string;
+  selectedNetwork: string;
 }
 
 export function GasEstimationModal({
@@ -30,6 +31,7 @@ export function GasEstimationModal({
   onConfirm,
   smartWalletClient,
   gasToken,
+  selectedNetwork,
 }: GasEstimationModalProps) {
   const [estimatedGas, setEstimatedGas] = useState<string>("");
   const [isEstimating, setIsEstimating] = useState(false);
@@ -74,7 +76,7 @@ export function GasEstimationModal({
   const estimateGasFee = async () => {
     try {
       setIsEstimating(true);
-      const gasTokenAddress = TOKEN_CONFIG[gasToken].address;
+      const gasTokenAddress = NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[gasToken].address;
 
       let data = encodeFunctionData({
         abi: TOKEN_DETAILS.abi,
@@ -84,7 +86,7 @@ export function GasEstimationModal({
 
       const calls = [
         {
-          to: TOKEN_DETAILS.address as Address,
+          to: NETWORKS[selectedNetwork as keyof typeof NETWORKS].dropTokenAddress as Address,
           value: BigInt(0),
           data,
         },
@@ -97,7 +99,7 @@ export function GasEstimationModal({
 
       setEstimatedGas(
         `${formatBalance(
-          results.estimatedFee,
+          results.fee.amount,
           TOKEN_CONFIG[gasToken].decimals
         )} ${TOKEN_CONFIG[gasToken].symbol}`
       );
@@ -145,13 +147,22 @@ export function GasEstimationModal({
               <div className="flex items-center justify-between">
                 <span className="text-sm text-zinc-400">Token Address:</span>
                 <a
-                  href={`${defaultChain.blockExplorers.default.url}/token/${TOKEN_CONFIG[gasToken].address}`}
+                  href={`${
+                    NETWORKS[selectedNetwork as keyof typeof NETWORKS].explorer
+                  }/token/${NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[
+                    gasToken
+                  ].address}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"
                 >
-                  {TOKEN_CONFIG[gasToken].address.slice(0, 6)}...
-                  {TOKEN_CONFIG[gasToken].address.slice(-4)}
+                  {NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[
+                    gasToken
+                  ].address.slice(0, 6)}
+                  ...
+                  {NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[
+                    gasToken
+                  ].address.slice(-4)}
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -169,7 +180,12 @@ export function GasEstimationModal({
                   </a>
                 ) : (
                   <a
-                    href={`https://base-sepolia.blockscout.com/address/${TOKEN_CONFIG[gasToken].address}`}
+                    href={`${
+                      NETWORKS[selectedNetwork as keyof typeof NETWORKS]
+                        .explorer
+                    }/address/${NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[
+                      gasToken
+                    ].address}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1"

@@ -1,32 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import { Address, formatEther, formatUnits } from "viem";
 import {
-  defaultChain,
+    NETWORKS,
   TOKEN_CONFIG,
 } from "@/constants/blockchain";
 import { createPublicClient, http } from "viem";
-import { TOKEN_DETAILS } from "@/constants/blockchain";
 
-const publicClient = createPublicClient({
-  chain: defaultChain,
-  transport: http(),
-});
 
 interface TokenHoldingsResponse {
   ethBalance: string;
-  usdcBalance: string;
+  usdcBalance?: string;
   wethBalance: string;
   dropBalance: string;
 }
 
-async function fetchBalances(address: Address): Promise<TokenHoldingsResponse> {
+async function fetchBalances(address: Address, network: string): Promise<TokenHoldingsResponse> {
   try {
+    const publicClient = createPublicClient({
+      chain: NETWORKS[network as keyof typeof NETWORKS].chain,
+      transport: http(),
+    });
     // Fetch native ETH balance
     const ethBalance = await publicClient.getBalance({ address });
 
     // Fetch USDC balance
-    const usdcBalance = await publicClient.readContract({
-      address: TOKEN_CONFIG.USDC.address as `0x${string}`,
+    let usdcBalance;
+    if (network != "inkSepolia" && network != "arbitrumSepolia") {
+    usdcBalance = await publicClient.readContract({
+      address: NETWORKS[network as keyof typeof NETWORKS].tokens.USDC.address as `0x${string}`,
       abi: [
         {
           name: "balanceOf",
@@ -39,10 +40,10 @@ async function fetchBalances(address: Address): Promise<TokenHoldingsResponse> {
       functionName: "balanceOf",
       args: [address],
     });
-
+  }
     // Fetch WETH balance
     const wethBalance = await publicClient.readContract({
-      address: TOKEN_CONFIG.WETH.address as `0x${string}`,
+      address: NETWORKS[network as keyof typeof NETWORKS].tokens.WETH.address as `0x${string}`,
       abi: [
         {
           name: "balanceOf",
@@ -58,7 +59,7 @@ async function fetchBalances(address: Address): Promise<TokenHoldingsResponse> {
 
     // Fetch Drop token balance
     const dropBalance = await publicClient.readContract({
-      address: TOKEN_DETAILS.address as `0x${string}`,
+      address: NETWORKS[network as keyof typeof NETWORKS].dropTokenAddress as `0x${string}`,
       abi: [
         {
           name: "balanceOf",
@@ -71,21 +72,38 @@ async function fetchBalances(address: Address): Promise<TokenHoldingsResponse> {
       functionName: "balanceOf",
       args: [address],
     });
-
+if (network != "inkSepolia" && network != "arbitrumSepolia") {
     return {
       ethBalance: formatEther(ethBalance),
       usdcBalance: formatUnits(
         usdcBalance as bigint,
-        TOKEN_CONFIG.USDC.decimals
+        6
       ),
       wethBalance: formatUnits(
         wethBalance as bigint,
-        TOKEN_CONFIG.WETH.decimals
+        18
       ),
       dropBalance: formatEther(dropBalance as bigint), // Assuming 18 decimals for Drop token
     };
+  } else {
+    return {
+      ethBalance: formatEther(ethBalance),
+      wethBalance: formatUnits(
+        wethBalance as bigint,
+        18
+      ),
+      dropBalance: formatEther(dropBalance as bigint), // Assuming 18 decimals for Drop token
+    };
+  }
   } catch (error) {
     console.error("Error fetching token balances:", error);
+  if (network != "inkSepolia" && network != "arbitrumSepolia") {
+    return {
+      ethBalance: "0",
+      wethBalance: "0",
+      dropBalance: "0",
+    };
+  }
     return {
       ethBalance: "0",
       usdcBalance: "0",
@@ -97,11 +115,11 @@ async function fetchBalances(address: Address): Promise<TokenHoldingsResponse> {
 
 export function useTokenHoldings(
   address: Address | undefined,
-  activeToken?: "USDC" | "WETH"
+  network: string
 ) {
   return useQuery({
     queryKey: ["tokenHoldings", address],
-    queryFn: () => fetchBalances(address!),
+    queryFn: () => fetchBalances(address!, network),
     enabled: !!address,
     refetchInterval: 10000, // Refetch every 10 seconds
   });

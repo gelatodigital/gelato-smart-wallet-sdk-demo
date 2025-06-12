@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/common/Dialog";
-import { defaultChain } from "@/constants/blockchain";
+import {  NETWORKS } from "@/constants/blockchain";
 import { truncateHash } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 
@@ -19,6 +19,7 @@ interface TransactionModalProps {
     gasToken: string;
   };
   isSponsored: boolean;
+  selectedNetwork: string;
 }
 
 export function TransactionModal({
@@ -28,6 +29,7 @@ export function TransactionModal({
   txHash,
   gasDetails,
   isSponsored,
+  selectedNetwork,
 }: TransactionModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -55,7 +57,7 @@ export function TransactionModal({
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">Transaction</span>
               <a
-                href={`https://base-sepolia.blockscout.com/tx/${txHash}`}
+                href={`${NETWORKS[selectedNetwork as keyof typeof NETWORKS].explorer}/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-300 inline-flex items-center gap-2 text-sm"

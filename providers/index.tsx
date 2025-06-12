@@ -7,7 +7,7 @@ import {
   dynamic,
   wagmi,
 } from "@gelatonetwork/smartwallet-react-sdk";
-import { baseSepolia } from "viem/chains";
+import { baseSepolia, sepolia, inkSepolia, arbitrumSepolia } from "viem/chains";
 import { http } from "wagmi";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -20,9 +20,12 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         apiKey: process.env.NEXT_PUBLIC_GELATO_API_KEY as string,
         waas: dynamic(process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID as string),
         wagmi: wagmi({
-          chains: [baseSepolia],
+          chains: [baseSepolia, inkSepolia, sepolia, arbitrumSepolia],
           transports: {
             [baseSepolia.id]: http(),
+            [inkSepolia.id]: http(),
+            [sepolia.id]: http(),
+            [arbitrumSepolia.id]: http(),
           },
         }),
       }}

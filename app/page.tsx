@@ -25,9 +25,9 @@ import {
   GelatoSmartWalletConnectButton,
 } from "@gelatonetwork/smartwallet-react-sdk";
 import {
-  defaultChain,
   TOKEN_CONFIG,
   TOKEN_DETAILS,
+  NETWORKS,
 } from "@/constants/blockchain";
 
 interface HomeProps {}
@@ -37,6 +37,7 @@ const GELATO_API_KEY = process.env.NEXT_PUBLIC_GELATO_API_KEY!;
 export default function Home({}: HomeProps) {
   const [accountAddress, setAccountAddress] = useState("");
   const [smartWalletClient, setSmartWalletClient] = useState<any>(null);
+  const [selectedNetwork, setSelectedNetwork] = useState("baseSepolia");
   const [logs, setLogs] = useState<
     {
       message: string;
@@ -65,7 +66,7 @@ export default function Home({}: HomeProps) {
   const [tokenBalance, setTokenBalance] = useState<any>("0");
   const [isTransactionProcessing, setIsTransactionProcessing] = useState(false);
   const [showTokenSelection, setShowTokenSelection] = useState(false);
-
+  const [isNetworkSwitching, setIsNetworkSwitching] = useState(false);
   const [transactionDetails, setTransactionDetails] = useState<{
     isOpen: boolean;
     userOpHash?: string;
@@ -84,11 +85,12 @@ export default function Home({}: HomeProps) {
   // 7702 configuration
   const {
     gelato: { client },
+    switchNetwork,
     logout,
   } = useGelatoSmartWalletProviderContext();
 
   const { data: tokenHoldings, refetch: refetchTokenHoldings } =
-    useTokenHoldings(accountAddress as Address, gasToken);
+    useTokenHoldings(accountAddress as Address, selectedNetwork);
 
   const fetchClient = () => {
     const smartWalletClient = client;
@@ -142,7 +144,7 @@ export default function Home({}: HomeProps) {
   ) => {
     try {
       const publicClient = createPublicClient({
-        chain: defaultChain,
+        chain: NETWORKS[selectedNetwork as keyof typeof NETWORKS].chain,
         transport: http(),
       });
 
@@ -195,14 +197,18 @@ export default function Home({}: HomeProps) {
 
       const calls = [
         {
-          to: TOKEN_DETAILS.address as Address,
+          to: NETWORKS[selectedNetwork as keyof typeof NETWORKS].dropTokenAddress as Address,
           value: BigInt(0),
           data,
         },
       ];
-      const smartWalletResponse = await smartWalletClient?.execute({
-        payment: erc20(TOKEN_CONFIG[gasToken].address as Address),
+      const preparedCalls : any = await smartWalletClient?.prepare({
+        payment: erc20(NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[gasToken].address as Address),
         calls,
+      });
+
+      const smartWalletResponse = await smartWalletClient?.send({
+        preparedCalls,
       });
 
       // Add initial log with estimated gas
@@ -221,7 +227,7 @@ export default function Home({}: HomeProps) {
 
       const actualGas = await getActualFees(
         txHash as string,
-        TOKEN_CONFIG[gasToken].address as Address,
+        NETWORKS[selectedNetwork as keyof typeof NETWORKS].tokens[gasToken].address as Address,
         gasToken
       );
 
@@ -241,7 +247,7 @@ export default function Home({}: HomeProps) {
 
       // Refresh token holdings after successful transaction
       if (accountAddress) {
-        refetchTokenHoldings();
+       await refetchTokenHoldings();
       }
     } catch (error: any) {
       addLog(
@@ -266,21 +272,26 @@ export default function Home({}: HomeProps) {
     setIsTransactionProcessing(true);
     try {
       const smartWalletClient = fetchClient();
+
       let data = encodeFunctionData({
         abi: TOKEN_DETAILS.abi,
         functionName: "drop",
         args: [],
       });
 
-      const smartWalletResponse = await smartWalletClient?.execute({
+      const preparedCalls : any = await smartWalletClient?.prepare({
         payment: sponsored(GELATO_API_KEY),
         calls: [
           {
-            to: TOKEN_DETAILS.address as Address,
+            to: NETWORKS[selectedNetwork as keyof typeof NETWORKS].dropTokenAddress as Address,
             value: BigInt(0),
             data,
           },
         ],
+      });
+
+      const smartWalletResponse = await smartWalletClient?.send({
+        preparedCalls,
       });
 
       addLog("Sending userOp through Gelato Bundler - Sponsored", {
@@ -301,7 +312,7 @@ export default function Home({}: HomeProps) {
 
       // Refresh token holdings after successful transaction
       if (accountAddress) {
-        refetchTokenHoldings();
+        await refetchTokenHoldings();
       }
     } catch (error: any) {
       console.log(error);
@@ -329,6 +340,20 @@ export default function Home({}: HomeProps) {
       isSponsored: details.isSponsored,
     });
   }, []);
+
+  const handleNetworkSwitch = async (network: string) => {
+    try {
+      setIsNetworkSwitching(true);
+      setSelectedNetwork(network);
+      await switchNetwork(NETWORKS[network as keyof typeof NETWORKS].chain.id);
+      await refetchTokenHoldings();
+    } catch (error) {
+      console.error("Error switching network:", error);
+      toast.error("Failed to switch network");
+    } finally {
+      setIsNetworkSwitching(false);
+    }
+  };
 
   useEffect(() => {
     function createAccount() {
@@ -417,6 +442,9 @@ export default function Home({}: HomeProps) {
                         accountAddress={accountAddress}
                         gasToken={gasToken}
                         handleLogout={handleLogout}
+                        selectedNetwork={selectedNetwork}
+                        handleNetworkSwitch={handleNetworkSwitch}
+                        isNetworkSwitching={isNetworkSwitching}
                       />
 
                       <div className="w-full flex flex-col p-4 bg-[#202020] border rounded-[12px] border-[#2A2A2A]">
@@ -514,6 +542,7 @@ export default function Home({}: HomeProps) {
                             </button>
                           ) : (
                             <div className="space-y-4">
+                              {selectedNetwork != "inkSepolia" && selectedNetwork != "arbitrumSepolia" && (
                               <button
                                 onClick={() => {
                                   setGasToken("USDC");
@@ -546,6 +575,7 @@ export default function Home({}: HomeProps) {
                                   </>
                                 )}
                               </button>
+                              )}
                               <button
                                 onClick={() => {
                                   setGasToken("WETH");
@@ -666,6 +696,7 @@ export default function Home({}: HomeProps) {
           smartWalletClient={smartWalletClient}
           gasToken={gasToken}
           tokenBalance={tokenBalance}
+          selectedNetwork={selectedNetwork}
         />
 
         <TransactionModal
@@ -677,6 +708,7 @@ export default function Home({}: HomeProps) {
           txHash={transactionDetails.txHash}
           gasDetails={transactionDetails.gasDetails}
           isSponsored={transactionDetails.isSponsored}
+          selectedNetwork={selectedNetwork}
         />
 
         <Toaster richColors />

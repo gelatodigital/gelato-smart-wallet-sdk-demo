@@ -1,24 +1,31 @@
 import React, { useState, useCallback } from "react";
 import { Address } from "viem";
-import { ExternalLink, Wallet } from "lucide-react";
+import { ExternalLink, Wallet, ChevronDown } from "lucide-react";
 import { useTokenHoldings } from "@/lib/hooks/useFetchBalances";
 import Image from "next/image";
+import { NETWORKS } from "@/constants/blockchain";
 
 interface WalletCardProps {
   accountAddress: string;
   gasToken: "USDC" | "WETH";
   handleLogout?: () => void;
+  selectedNetwork: string;
+  handleNetworkSwitch: (network: string) => void;
+  isNetworkSwitching: boolean;
 }
 
 export default function WalletCard({
   accountAddress,
   gasToken,
   handleLogout,
+  selectedNetwork,
+  handleNetworkSwitch,
+  isNetworkSwitching,
 }: WalletCardProps) {
   const [isCopied, setIsCopied] = useState(false);
   const { data: tokenHoldings } = useTokenHoldings(
     accountAddress as Address,
-    gasToken
+    selectedNetwork
   );
 
   /**
@@ -36,13 +43,30 @@ export default function WalletCard({
    * Uses the Scope Explorer for Base Sepolia
    */
   const handleExplorerClick = () => {
-    window.open(`https://scope.sh/84532/address/${accountAddress}`, "_blank");
+      window.open(`${NETWORKS[selectedNetwork as keyof typeof NETWORKS].explorer}/address/${accountAddress}`, "_blank");
   };
 
   return (
     <div className="space-y-4">
       <div className="w-full flex flex-col p-4 bg-[#202020] border rounded-[12px] border-[#2A2A2A]">
-        <div className="flex justify-center">
+          <div className="flex flex-row items-center justify-between gap-4">
+                    <div className="relative">
+                      <select
+                        value={selectedNetwork}
+                        onChange={(e) => {
+                          handleNetworkSwitch(e.target.value);
+                        }}
+                        disabled={isNetworkSwitching}
+                        className="w-[200px] py-2.5 px-4 bg-[#252525] border border-[#2A2A2A] rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none cursor-pointer hover:bg-[#2A2A2A] transition-colors pr-10"
+                      >
+                        {Object.keys(NETWORKS).map((network) => (
+                          <option key={network} value={network} className="bg-[#252525]">
+                            {NETWORKS[network as keyof typeof NETWORKS].name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    </div>
           {handleLogout && (
             <button
               onClick={handleLogout}
@@ -102,7 +126,15 @@ export default function WalletCard({
             Wallet Balance
           </h3>
         </div>
-
+        {isNetworkSwitching ? (
+          <div className="flex flex-col items-center justify-center py-8 gap-4">
+            <div className="relative w-12 h-12">
+              <div className="absolute w-12 h-12 border-4 border-[#2A2A2A] rounded-full"></div>
+              <div className="absolute w-12 h-12 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <span className="text-sm text-gray-400">Switching networks...</span>
+          </div>
+        ) : (
         <div className="space-y-2">
           <div className="flex items-center justify-between py-2 border-b border-dark-200">
             <div className="flex items-center">
@@ -122,7 +154,7 @@ export default function WalletCard({
             </div>
           </div>
 
-          <div className="flex items-center justify-between py-2 border-b border-dark-200">
+          {selectedNetwork != "inkSepolia" && selectedNetwork != "arbitrumSepolia" && <div className="flex items-center justify-between py-2 border-b border-dark-200">
             <div className="flex items-center">
               <div className="w-6 h-6 mr-2">
                 <Image
@@ -138,7 +170,7 @@ export default function WalletCard({
             <div className="text-sm text-text-title">
               {tokenHoldings?.usdcBalance || "0.00"}
             </div>
-          </div>
+          </div>}
 
           <div className="flex items-center justify-between py-2 border-b border-dark-200">
             <div className="flex items-center">
@@ -168,8 +200,9 @@ export default function WalletCard({
             <div className="text-sm text-text-title">
               {tokenHoldings?.dropBalance || "0.0000"}
             </div>
-          </div>
-        </div>
+            </div>
+            </div>
+        )}
       </div>
     </div>
   );
