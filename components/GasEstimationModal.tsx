@@ -97,7 +97,7 @@ export function GasEstimationModal({
 
       setEstimatedGas(
         `${formatBalance(
-          results.estimatedFee,
+          results.fee.amount,
           TOKEN_CONFIG[gasToken].decimals
         )} ${TOKEN_CONFIG[gasToken].symbol}`
       );
